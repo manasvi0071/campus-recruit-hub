@@ -9,11 +9,66 @@ import * as zod from 'zod';
 
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
   "status": zod.string()
+})
+
+
+/**
+ * @summary Register a new user
+ */
+
+
+export const registerBodyPasswordMin = 6;
+
+
+
+export const RegisterBody = zod.object({
+  "name": zod.string().min(1),
+  "email": zod.string().min(1),
+  "password": zod.string().min(registerBodyPasswordMin),
+  "role": zod.string()
+})
+
+
+/**
+ * @summary Login
+ */
+
+
+
+
+export const LoginBody = zod.object({
+  "email": zod.string().min(1),
+  "password": zod.string().min(1)
+})
+
+export const LoginResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.string()
+})
+
+
+/**
+ * @summary Logout
+ */
+export const LogoutResponse = zod.object({
+  "message": zod.string()
+})
+
+
+/**
+ * @summary Get current user
+ */
+export const GetMeResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.string()
 })
 
 
@@ -59,9 +114,6 @@ export const CreateStudentBody = zod.object({
 })
 
 
-/**
- * @summary Get a student by ID
- */
 export const GetStudentParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -82,9 +134,6 @@ export const GetStudentResponse = zod.object({
 })
 
 
-/**
- * @summary Update a student
- */
 export const UpdateStudentParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -118,17 +167,11 @@ export const UpdateStudentResponse = zod.object({
 })
 
 
-/**
- * @summary Delete a student
- */
 export const DeleteStudentParams = zod.object({
   "id": zod.coerce.number()
 })
 
 
-/**
- * @summary List all companies
- */
 export const ListCompaniesResponseItem = zod.object({
   "id": zod.number(),
   "name": zod.string(),
@@ -145,9 +188,6 @@ export const ListCompaniesResponseItem = zod.object({
 export const ListCompaniesResponse = zod.array(ListCompaniesResponseItem)
 
 
-/**
- * @summary Create a new company
- */
 
 
 
@@ -165,9 +205,6 @@ export const CreateCompanyBody = zod.object({
 })
 
 
-/**
- * @summary Get a company by ID
- */
 export const GetCompanyParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -187,9 +224,6 @@ export const GetCompanyResponse = zod.object({
 })
 
 
-/**
- * @summary Update a company
- */
 export const UpdateCompanyParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -221,17 +255,11 @@ export const UpdateCompanyResponse = zod.object({
 })
 
 
-/**
- * @summary Delete a company
- */
 export const DeleteCompanyParams = zod.object({
   "id": zod.coerce.number()
 })
 
 
-/**
- * @summary List all job postings
- */
 export const ListJobsResponseItem = zod.object({
   "id": zod.number(),
   "title": zod.string(),
@@ -249,9 +277,6 @@ export const ListJobsResponseItem = zod.object({
 export const ListJobsResponse = zod.array(ListJobsResponseItem)
 
 
-/**
- * @summary Create a new job posting
- */
 
 
 
@@ -267,9 +292,6 @@ export const CreateJobBody = zod.object({
 })
 
 
-/**
- * @summary Get a job by ID
- */
 export const GetJobParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -290,9 +312,6 @@ export const GetJobResponse = zod.object({
 })
 
 
-/**
- * @summary Update a job posting
- */
 export const UpdateJobParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -323,17 +342,11 @@ export const UpdateJobResponse = zod.object({
 })
 
 
-/**
- * @summary Delete a job posting
- */
 export const DeleteJobParams = zod.object({
   "id": zod.coerce.number()
 })
 
 
-/**
- * @summary List all applications
- */
 export const ListApplicationsQueryParams = zod.object({
   "jobId": zod.coerce.number().optional(),
   "studentId": zod.coerce.number().optional()
@@ -352,9 +365,6 @@ export const ListApplicationsResponseItem = zod.object({
 export const ListApplicationsResponse = zod.array(ListApplicationsResponseItem)
 
 
-/**
- * @summary Create a new application
- */
 export const CreateApplicationBody = zod.object({
   "studentId": zod.number(),
   "jobId": zod.number(),
@@ -362,9 +372,6 @@ export const CreateApplicationBody = zod.object({
 })
 
 
-/**
- * @summary Update application status
- */
 export const UpdateApplicationParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -385,9 +392,6 @@ export const UpdateApplicationResponse = zod.object({
 })
 
 
-/**
- * @summary Get dashboard statistics
- */
 export const GetDashboardStatsResponse = zod.object({
   "totalStudents": zod.number(),
   "placedStudents": zod.number(),
@@ -400,6 +404,73 @@ export const GetDashboardStatsResponse = zod.object({
   "offered": zod.number(),
   "joined": zod.number()
 })
+})
+
+
+/**
+ * @summary List all grievances (admin)
+ */
+export const ListGrievancesResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "submittedBy": zod.string(),
+  "email": zod.string(),
+  "subject": zod.string(),
+  "description": zod.string(),
+  "category": zod.string(),
+  "status": zod.string(),
+  "priority": zod.string(),
+  "adminNote": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+export const ListGrievancesResponse = zod.array(ListGrievancesResponseItem)
+
+
+/**
+ * @summary Submit a new grievance
+ */
+
+
+
+
+
+
+export const CreateGrievanceBody = zod.object({
+  "userId": zod.number(),
+  "submittedBy": zod.string().min(1),
+  "email": zod.string().min(1),
+  "subject": zod.string().min(1),
+  "description": zod.string().min(1),
+  "category": zod.string().optional(),
+  "priority": zod.string().optional()
+})
+
+
+/**
+ * @summary Update grievance status (admin)
+ */
+export const UpdateGrievanceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateGrievanceBody = zod.object({
+  "status": zod.string().optional(),
+  "adminNote": zod.string().optional(),
+  "priority": zod.string().optional()
+})
+
+export const UpdateGrievanceResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "submittedBy": zod.string(),
+  "email": zod.string(),
+  "subject": zod.string(),
+  "description": zod.string(),
+  "category": zod.string(),
+  "status": zod.string(),
+  "priority": zod.string(),
+  "adminNote": zod.string().nullish(),
+  "createdAt": zod.string()
 })
 
 

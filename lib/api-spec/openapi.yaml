@@ -9,24 +9,19 @@ servers:
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
   - name: students
-    description: Student management
   - name: companies
-    description: Company management
   - name: jobs
-    description: Job posting management
   - name: applications
-    description: Application management
   - name: dashboard
-    description: Dashboard stats
+  - name: grievances
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -34,6 +29,76 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Registered user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "400":
+          description: Bad request
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Not authenticated
 
   /students:
     get:
@@ -71,7 +136,6 @@ paths:
     get:
       operationId: getStudent
       tags: [students]
-      summary: Get a student by ID
       parameters:
         - name: id
           in: path
@@ -90,7 +154,6 @@ paths:
     patch:
       operationId: updateStudent
       tags: [students]
-      summary: Update a student
       parameters:
         - name: id
           in: path
@@ -115,7 +178,6 @@ paths:
     delete:
       operationId: deleteStudent
       tags: [students]
-      summary: Delete a student
       parameters:
         - name: id
           in: path
@@ -132,7 +194,6 @@ paths:
     get:
       operationId: listCompanies
       tags: [companies]
-      summary: List all companies
       responses:
         "200":
           description: List of companies
@@ -145,7 +206,6 @@ paths:
     post:
       operationId: createCompany
       tags: [companies]
-      summary: Create a new company
       requestBody:
         required: true
         content:
@@ -164,7 +224,6 @@ paths:
     get:
       operationId: getCompany
       tags: [companies]
-      summary: Get a company by ID
       parameters:
         - name: id
           in: path
@@ -183,7 +242,6 @@ paths:
     patch:
       operationId: updateCompany
       tags: [companies]
-      summary: Update a company
       parameters:
         - name: id
           in: path
@@ -208,7 +266,6 @@ paths:
     delete:
       operationId: deleteCompany
       tags: [companies]
-      summary: Delete a company
       parameters:
         - name: id
           in: path
@@ -225,7 +282,6 @@ paths:
     get:
       operationId: listJobs
       tags: [jobs]
-      summary: List all job postings
       responses:
         "200":
           description: List of jobs
@@ -238,7 +294,6 @@ paths:
     post:
       operationId: createJob
       tags: [jobs]
-      summary: Create a new job posting
       requestBody:
         required: true
         content:
@@ -257,7 +312,6 @@ paths:
     get:
       operationId: getJob
       tags: [jobs]
-      summary: Get a job by ID
       parameters:
         - name: id
           in: path
@@ -276,7 +330,6 @@ paths:
     patch:
       operationId: updateJob
       tags: [jobs]
-      summary: Update a job posting
       parameters:
         - name: id
           in: path
@@ -301,7 +354,6 @@ paths:
     delete:
       operationId: deleteJob
       tags: [jobs]
-      summary: Delete a job posting
       parameters:
         - name: id
           in: path
@@ -318,7 +370,6 @@ paths:
     get:
       operationId: listApplications
       tags: [applications]
-      summary: List all applications
       parameters:
         - name: jobId
           in: query
@@ -340,7 +391,6 @@ paths:
     post:
       operationId: createApplication
       tags: [applications]
-      summary: Create a new application
       requestBody:
         required: true
         content:
@@ -359,7 +409,6 @@ paths:
     patch:
       operationId: updateApplication
       tags: [applications]
-      summary: Update application status
       parameters:
         - name: id
           in: path
@@ -386,7 +435,6 @@ paths:
     get:
       operationId: getDashboardStats
       tags: [dashboard]
-      summary: Get dashboard statistics
       responses:
         "200":
           description: Dashboard stats
@@ -395,15 +443,120 @@ paths:
               schema:
                 $ref: "#/components/schemas/DashboardStats"
 
+  /grievances:
+    get:
+      operationId: listGrievances
+      tags: [grievances]
+      summary: List all grievances (admin)
+      responses:
+        "200":
+          description: List of grievances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Grievance"
+    post:
+      operationId: createGrievance
+      tags: [grievances]
+      summary: Submit a new grievance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrievanceInput"
+      responses:
+        "201":
+          description: Created grievance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Grievance"
+
+  /grievances/{id}:
+    patch:
+      operationId: updateGrievance
+      tags: [grievances]
+      summary: Update grievance status (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrievanceUpdate"
+      responses:
+        "200":
+          description: Updated grievance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Grievance"
+        "404":
+          description: Not found
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
+
+    MessageResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    AuthUser:
+      type: object
+      required: [id, name, email, role]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+
+    RegisterInput:
+      type: object
+      required: [name, email, password, role]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 6
+        role:
+          type: string
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
 
     Student:
       type: object
@@ -693,3 +846,63 @@ components:
               type: integer
             joined:
               type: integer
+
+    Grievance:
+      type: object
+      required: [id, userId, submittedBy, email, subject, description, category, status, priority, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        submittedBy:
+          type: string
+        email:
+          type: string
+        subject:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+        priority:
+          type: string
+        adminNote:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    GrievanceInput:
+      type: object
+      required: [userId, submittedBy, email, subject, description]
+      properties:
+        userId:
+          type: integer
+        submittedBy:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          minLength: 1
+        subject:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        category:
+          type: string
+        priority:
+          type: string
+
+    GrievanceUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+        adminNote:
+          type: string
+        priority:
+          type: string

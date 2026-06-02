@@ -9,6 +9,34 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface MessageResponse {
+  message: string;
+}
+
+export interface AuthUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface RegisterInput {
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 6 */
+  password: string;
+  role: string;
+}
+
+export interface LoginInput {
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
+  password: string;
+}
+
 export interface Student {
   id: number;
   name: string;
@@ -185,6 +213,41 @@ export interface DashboardStats {
   activeJobs: number;
   totalCompanies: number;
   applicationsByStatus: DashboardStatsApplicationsByStatus;
+}
+
+export interface Grievance {
+  id: number;
+  userId: number;
+  submittedBy: string;
+  email: string;
+  subject: string;
+  description: string;
+  category: string;
+  status: string;
+  priority: string;
+  /** @nullable */
+  adminNote?: string | null;
+  createdAt: string;
+}
+
+export interface GrievanceInput {
+  userId: number;
+  /** @minLength 1 */
+  submittedBy: string;
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
+  subject: string;
+  /** @minLength 1 */
+  description: string;
+  category?: string;
+  priority?: string;
+}
+
+export interface GrievanceUpdate {
+  status?: string;
+  adminNote?: string;
+  priority?: string;
 }
 
 export type ListApplicationsParams = {
