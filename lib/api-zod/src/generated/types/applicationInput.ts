@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface ApplicationInput {
+  studentId: number;
+  jobId: number;
+  status?: string;
 }

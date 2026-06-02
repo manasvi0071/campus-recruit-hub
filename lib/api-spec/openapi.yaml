@@ -3,13 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Campus Recruitment Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: students
+    description: Student management
+  - name: companies
+    description: Company management
+  - name: jobs
+    description: Job posting management
+  - name: applications
+    description: Application management
+  - name: dashboard
+    description: Dashboard stats
 paths:
   /healthz:
     get:
@@ -24,6 +34,367 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /students:
+    get:
+      operationId: listStudents
+      tags: [students]
+      summary: List all students
+      responses:
+        "200":
+          description: List of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+    post:
+      operationId: createStudent
+      tags: [students]
+      summary: Create a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentInput"
+      responses:
+        "201":
+          description: Created student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+
+  /students/{id}:
+    get:
+      operationId: getStudent
+      tags: [students]
+      summary: Get a student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateStudent
+      tags: [students]
+      summary: Update a student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentUpdate"
+      responses:
+        "200":
+          description: Updated student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteStudent
+      tags: [students]
+      summary: Delete a student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /companies:
+    get:
+      operationId: listCompanies
+      tags: [companies]
+      summary: List all companies
+      responses:
+        "200":
+          description: List of companies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Company"
+    post:
+      operationId: createCompany
+      tags: [companies]
+      summary: Create a new company
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyInput"
+      responses:
+        "201":
+          description: Created company
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+
+  /companies/{id}:
+    get:
+      operationId: getCompany
+      tags: [companies]
+      summary: Get a company by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Company
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateCompany
+      tags: [companies]
+      summary: Update a company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyUpdate"
+      responses:
+        "200":
+          description: Updated company
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteCompany
+      tags: [companies]
+      summary: Delete a company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /jobs:
+    get:
+      operationId: listJobs
+      tags: [jobs]
+      summary: List all job postings
+      responses:
+        "200":
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+    post:
+      operationId: createJob
+      tags: [jobs]
+      summary: Create a new job posting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobInput"
+      responses:
+        "201":
+          description: Created job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  /jobs/{id}:
+    get:
+      operationId: getJob
+      tags: [jobs]
+      summary: Get a job by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateJob
+      tags: [jobs]
+      summary: Update a job posting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobUpdate"
+      responses:
+        "200":
+          description: Updated job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteJob
+      tags: [jobs]
+      summary: Delete a job posting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /applications:
+    get:
+      operationId: listApplications
+      tags: [applications]
+      summary: List all applications
+      parameters:
+        - name: jobId
+          in: query
+          schema:
+            type: integer
+        - name: studentId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Application"
+    post:
+      operationId: createApplication
+      tags: [applications]
+      summary: Create a new application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationInput"
+      responses:
+        "201":
+          description: Created application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+
+  /applications/{id}:
+    patch:
+      operationId: updateApplication
+      tags: [applications]
+      summary: Update application status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationUpdate"
+      responses:
+        "200":
+          description: Updated application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "404":
+          description: Not found
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +405,291 @@ components:
       required:
         - status
 
+    Student:
+      type: object
+      required: [id, name, email, branch, cgpa, graduationYear, status, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        branch:
+          type: string
+        cgpa:
+          type: number
+        graduationYear:
+          type: integer
+        skills:
+          type: ["string", "null"]
+        status:
+          type: string
+        phone:
+          type: ["string", "null"]
+        resumeUrl:
+          type: ["string", "null"]
+        readinessScore:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    StudentInput:
+      type: object
+      required: [name, email, branch, cgpa, graduationYear]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          minLength: 1
+        branch:
+          type: string
+          minLength: 1
+        cgpa:
+          type: number
+        graduationYear:
+          type: integer
+        skills:
+          type: string
+        status:
+          type: string
+        phone:
+          type: string
+        resumeUrl:
+          type: string
+        readinessScore:
+          type: integer
+
+    StudentUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        branch:
+          type: string
+        cgpa:
+          type: number
+        graduationYear:
+          type: integer
+        skills:
+          type: string
+        status:
+          type: string
+        phone:
+          type: string
+        resumeUrl:
+          type: string
+        readinessScore:
+          type: integer
+
+    Company:
+      type: object
+      required: [id, name, industry, status, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        industry:
+          type: string
+        website:
+          type: ["string", "null"]
+        contactName:
+          type: ["string", "null"]
+        contactEmail:
+          type: ["string", "null"]
+        avgPackageLpa:
+          type: ["number", "null"]
+        totalHires:
+          type: ["integer", "null"]
+        relationshipHealth:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+
+    CompanyInput:
+      type: object
+      required: [name, industry]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        industry:
+          type: string
+          minLength: 1
+        website:
+          type: string
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        avgPackageLpa:
+          type: number
+        totalHires:
+          type: integer
+        relationshipHealth:
+          type: string
+        status:
+          type: string
+
+    CompanyUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        industry:
+          type: string
+        website:
+          type: string
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        avgPackageLpa:
+          type: number
+        totalHires:
+          type: integer
+        relationshipHealth:
+          type: string
+        status:
+          type: string
+
+    Job:
+      type: object
+      required: [id, title, companyId, status, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        companyId:
+          type: integer
+        companyName:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        eligibleBranches:
+          type: ["string", "null"]
+        minCgpa:
+          type: ["number", "null"]
+        packageLpa:
+          type: ["number", "null"]
+        deadline:
+          type: ["string", "null"]
+        status:
+          type: string
+        applicantsCount:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    JobInput:
+      type: object
+      required: [title, companyId]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        companyId:
+          type: integer
+        description:
+          type: string
+        eligibleBranches:
+          type: string
+        minCgpa:
+          type: number
+        packageLpa:
+          type: number
+        deadline:
+          type: string
+        status:
+          type: string
+
+    JobUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        eligibleBranches:
+          type: string
+        minCgpa:
+          type: number
+        packageLpa:
+          type: number
+        deadline:
+          type: string
+        status:
+          type: string
+
+    Application:
+      type: object
+      required: [id, studentId, jobId, status, createdAt]
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        jobId:
+          type: integer
+        studentName:
+          type: ["string", "null"]
+        jobTitle:
+          type: ["string", "null"]
+        companyName:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+
+    ApplicationInput:
+      type: object
+      required: [studentId, jobId]
+      properties:
+        studentId:
+          type: integer
+        jobId:
+          type: integer
+        status:
+          type: string
+
+    ApplicationUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+
+    DashboardStats:
+      type: object
+      required: [totalStudents, placedStudents, activeJobs, totalCompanies, applicationsByStatus]
+      properties:
+        totalStudents:
+          type: integer
+        placedStudents:
+          type: integer
+        activeJobs:
+          type: integer
+        totalCompanies:
+          type: integer
+        applicationsByStatus:
+          type: object
+          required: [applied, screened, interviewed, offered, joined]
+          properties:
+            applied:
+              type: integer
+            screened:
+              type: integer
+            interviewed:
+              type: integer
+            offered:
+              type: integer
+            joined:
+              type: integer
