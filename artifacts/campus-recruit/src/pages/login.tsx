@@ -53,7 +53,7 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-4">
             <BrainCircuit className="w-7 h-7 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">PlaceIQ</h1>
+          <h1 className="text-3xl font-bold tracking-tight">TalentHub Campus</h1>
           <p className="text-muted-foreground mt-1">Campus Recruitment Management</p>
         </motion.div>
 

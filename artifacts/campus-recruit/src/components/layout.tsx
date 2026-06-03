@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, Users, Building2, Briefcase, BarChart3,
-  BrainCircuit, Sun, Moon, MessageSquareWarning, LogOut, ChevronDown,
+  BrainCircuit, Sun, Moon, MessageSquareWarning, LogOut, ChevronDown, Trophy,
 } from "lucide-react";
 import { useTheme } from "./theme-provider";
 import { Button } from "./ui/button";
@@ -18,6 +18,7 @@ const navItems = [
   { href: "/jobs", label: "Jobs & Drives", icon: Briefcase },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/ai-insights", label: "AI Insights", icon: BrainCircuit },
+  { href: "/scorecard", label: "Readiness Scorecard", icon: Trophy },
   { href: "/grievances", label: "Grievances", icon: MessageSquareWarning },
 ];
 
@@ -34,9 +35,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* Sidebar */}
       <aside className="w-64 border-r bg-card flex flex-col hidden md:flex shrink-0">
-        <div className="h-16 flex items-center px-6 border-b">
-          <BrainCircuit className="w-6 h-6 text-primary mr-2" />
-          <span className="font-bold text-lg tracking-tight">PlaceIQ</span>
+        <div className="h-16 flex items-center px-6 border-b gap-2">
+          <BrainCircuit className="w-6 h-6 text-primary shrink-0" />
+          <span className="font-bold text-base tracking-tight leading-tight">TalentHub Campus</span>
         </div>
 
         <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
@@ -52,7 +53,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   }`}
                   data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                 >
-                  <item.icon className={`w-4 h-4 mr-3 ${isActive ? "text-primary-foreground" : "text-muted-foreground"}`} />
+                  <item.icon className={`w-4 h-4 mr-3 shrink-0 ${isActive ? "text-primary-foreground" : "text-muted-foreground"}`} />
                   {item.label}
                 </div>
               </Link>
@@ -61,12 +62,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="p-4 border-t">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 hover:bg-muted/50 rounded-md px-2 py-1.5 transition-colors w-full text-left"
+                <button className="flex items-center gap-3 hover:bg-muted/50 rounded-md px-2 py-1.5 transition-colors flex-1 min-w-0 text-left"
                   data-testid="btn-user-menu">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8 shrink-0">
                     <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
                       {initials}
                     </AvatarFallback>
@@ -103,9 +104,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Mobile Header */}
         <header className="h-16 border-b bg-card flex items-center justify-between px-4 md:hidden shrink-0">
-          <div className="flex items-center">
-            <BrainCircuit className="w-6 h-6 text-primary mr-2" />
-            <span className="font-bold text-lg">PlaceIQ</span>
+          <div className="flex items-center gap-2">
+            <BrainCircuit className="w-6 h-6 text-primary" />
+            <span className="font-bold text-base">TalentHub Campus</span>
           </div>
           <div className="flex items-center gap-2">
             <Button

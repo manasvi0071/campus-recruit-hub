@@ -84,7 +84,7 @@ export default function Register() {
             <BrainCircuit className="w-7 h-7 text-primary" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">Create Account</h1>
-          <p className="text-muted-foreground mt-1">Join the PlaceIQ placement platform</p>
+          <p className="text-muted-foreground mt-1">Join the TalentHub Campus placement platform</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>

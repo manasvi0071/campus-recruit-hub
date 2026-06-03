@@ -1,14 +1,50 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, FileText, AlertTriangle, Crosshair, Sparkles, CheckCircle2 } from "lucide-react";
+import { BrainCircuit, FileText, AlertTriangle, Crosshair, Sparkles, CheckCircle2, Copy, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
+
+const SMART_DRAFT = `Dear Hiring Manager,
+
+I am writing to express my interest in the Full Stack Developer position. As a Computer Science graduate with hands-on experience in React, Node.js, and PostgreSQL, I am confident in my ability to contribute effectively.
+
+Key highlights:
+• Developed a scalable e-commerce platform serving 500+ users, achieving 99.9% uptime
+• Reduced API response time by 35% through query optimization and Redis caching
+• Contributed to 3 open-source projects with 120+ GitHub stars
+
+I am proficient in modern tooling including Docker, AWS EC2/S3, and CI/CD pipelines. I am eager to bring my problem-solving skills and passion for clean code to your team.
+
+I look forward to discussing how my background aligns with your goals.
+
+Warm regards,
+Amit Kumar`;
 
 export default function AIInsights() {
+  const { toast } = useToast();
+  const [generating, setGenerating] = useState(false);
+  const [draft, setDraft] = useState<string | null>(null);
+
+  const handleGenerateDraft = () => {
+    setGenerating(true);
+    setDraft(null);
+    setTimeout(() => {
+      setGenerating(false);
+      setDraft(SMART_DRAFT);
+    }, 1800);
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(SMART_DRAFT);
+    toast({ title: "Copied to clipboard!" });
+  };
+
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -19,7 +55,7 @@ export default function AIInsights() {
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
             AI Insights Hub <Sparkles className="w-6 h-6 text-primary" />
           </h1>
-          <p className="text-muted-foreground mt-1">Predictive analytics and smart recommendations powered by PlaceIQ AI.</p>
+          <p className="text-muted-foreground mt-1">Predictive analytics and smart recommendations powered by TalentHub AI.</p>
         </div>
         <Button variant="outline" className="bg-primary/5 border-primary/20 text-primary">
           <BrainCircuit className="w-4 h-4 mr-2" /> Run Full Analysis
@@ -27,7 +63,7 @@ export default function AIInsights() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Column 1 */}
         <div className="space-y-6 lg:col-span-1">
           <Card className="border-primary/20 shadow-md shadow-primary/5">
@@ -76,7 +112,7 @@ export default function AIInsights() {
                 ].map((s, i) => (
                   <div key={i} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="font-bold text-muted-foreground text-sm w-4">{i+1}.</div>
+                      <div className="font-bold text-muted-foreground text-sm w-4">{i + 1}.</div>
                       <div>
                         <p className="text-sm font-medium">{s.name}</p>
                         <p className="text-xs text-muted-foreground">{s.branch}</p>
@@ -112,7 +148,7 @@ export default function AIInsights() {
                     <h3 className="text-lg font-semibold">Amit Kumar (CS21092)</h3>
                     <p className="text-sm text-muted-foreground">Target Role: Full Stack Developer</p>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="font-medium">Overall ATS Score</span>
@@ -159,9 +195,48 @@ export default function AIInsights() {
                       <span>Excellent clean formatting, no parsing errors detected by simulated ATS.</span>
                     </li>
                   </ul>
-                  <Button size="sm" className="w-full mt-2">Generate Smart Suggestion Draft</Button>
+                  <Button
+                    size="sm" className="w-full mt-2"
+                    onClick={handleGenerateDraft}
+                    disabled={generating}
+                    data-testid="btn-generate-draft"
+                  >
+                    {generating ? (
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating…</>
+                    ) : (
+                      <><Sparkles className="w-4 h-4 mr-2" /> Generate Smart Suggestion Draft</>
+                    )}
+                  </Button>
                 </div>
               </div>
+
+              {/* Draft output */}
+              <AnimatePresence>
+                {draft && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="mt-4 overflow-hidden"
+                  >
+                    <div className="border rounded-lg bg-muted/30 p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-semibold flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-primary" />
+                          AI-Generated Cover Letter Draft
+                        </h4>
+                        <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 px-2 text-xs gap-1.5">
+                          <Copy className="w-3.5 h-3.5" /> Copy
+                        </Button>
+                      </div>
+                      <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-sans leading-relaxed">
+                        {draft}
+                      </pre>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </CardContent>
           </Card>
 

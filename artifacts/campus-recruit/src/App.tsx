@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,6 +15,7 @@ import Jobs from "@/pages/jobs";
 import Analytics from "@/pages/analytics";
 import AIInsights from "@/pages/ai-insights";
 import Grievances from "@/pages/grievances";
+import Scorecard from "@/pages/scorecard";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 
@@ -25,6 +27,12 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
 
+  useEffect(() => {
+    if (!loading && !user) {
+      setLocation("/login");
+    }
+  }, [loading, user, setLocation]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -33,10 +41,7 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
     );
   }
 
-  if (!user) {
-    setLocation("/login");
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <Layout>
@@ -56,6 +61,7 @@ function Router() {
       <Route path="/jobs" component={() => <ProtectedRoute component={Jobs} />} />
       <Route path="/analytics" component={() => <ProtectedRoute component={Analytics} />} />
       <Route path="/ai-insights" component={() => <ProtectedRoute component={AIInsights} />} />
+      <Route path="/scorecard" component={() => <ProtectedRoute component={Scorecard} />} />
       <Route path="/grievances" component={() => <ProtectedRoute component={Grievances} />} />
       <Route component={NotFound} />
     </Switch>
