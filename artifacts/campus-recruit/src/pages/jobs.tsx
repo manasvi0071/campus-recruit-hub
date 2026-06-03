@@ -20,17 +20,27 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, CalendarIcon, Trash2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { Search, Plus, CalendarIcon, Trash2, CheckCircle2 } from "lucide-react";
 
 function statusVariant(status: string) {
-  if (status === "open") return "default";
-  if (status === "screening") return "secondary";
-  return "outline";
+  if (status === "open") return "default" as const;
+  if (status === "screening") return "secondary" as const;
+  return "outline" as const;
 }
 
 export default function Jobs() {
+  const { user } = useAuth();
+  const role = user?.role ?? "student";
+  const isAdmin = role === "admin";
+  const isRecruiter = role === "recruiter";
+  const canManage = isAdmin || isRecruiter;
+
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set());
+  const [applyingId, setApplyingId] = useState<number | null>(null);
+
   const [form, setForm] = useState({
     title: "", companyId: "", description: "", eligibleBranches: "",
     minCgpa: "", packageLpa: "", deadline: "", status: "open",
@@ -51,9 +61,7 @@ export default function Jobs() {
   const invalidate = () => queryClient.invalidateQueries({ queryKey: getListJobsQueryKey() });
 
   const handleSubmit = () => {
-    if (!form.companyId) {
-      toast({ title: "Please select a company", variant: "destructive" }); return;
-    }
+    if (!form.companyId) { toast({ title: "Please select a company", variant: "destructive" }); return; }
     createJob.mutate({
       data: {
         title: form.title, companyId: parseInt(form.companyId),
@@ -79,6 +87,15 @@ export default function Jobs() {
     });
   };
 
+  const handleApply = async (job: typeof jobs[number]) => {
+    if (appliedJobs.has(job.id)) return;
+    setApplyingId(job.id);
+    await new Promise(r => setTimeout(r, 800));
+    setAppliedJobs(prev => new Set([...prev, job.id]));
+    setApplyingId(null);
+    toast({ title: "Application submitted!", description: `You applied for ${job.title} at ${job.companyName}.` });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -88,80 +105,86 @@ export default function Jobs() {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Job Postings & Drives</h1>
-          <p className="text-muted-foreground mt-1">Manage active recruitment drives and job openings.</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {canManage ? "Job Postings & Drives" : "Browse Job Openings"}
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            {canManage
+              ? "Manage active recruitment drives and job openings."
+              : "Explore active placement drives and apply to eligible roles."}
+          </p>
         </div>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="btn-post-job">
-              <Plus className="w-4 h-4 mr-2" /> Post New Job
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[520px]">
-            <DialogHeader>
-              <DialogTitle>Post New Job Drive</DialogTitle>
-              <DialogDescription>Create a new job posting for students to apply.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Company</Label>
-                <div className="col-span-3">
-                  <Select value={form.companyId} onValueChange={v => setForm(p => ({ ...p, companyId: v }))}>
-                    <SelectTrigger data-testid="select-company-job">
-                      <SelectValue placeholder="Select company" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {companies.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              {[
-                { id: "title", label: "Role Title", placeholder: "e.g. Software Engineer" },
-                { id: "eligibleBranches", label: "Eligible Branches", placeholder: "e.g. CSE,ECE" },
-                { id: "minCgpa", label: "Min CGPA", placeholder: "e.g. 7.0" },
-                { id: "packageLpa", label: "Package (LPA)", placeholder: "e.g. 12.5" },
-              ].map(f => (
-                <div key={f.id} className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor={f.id} className="text-right">{f.label}</Label>
-                  <Input
-                    id={f.id} placeholder={f.placeholder} className="col-span-3"
-                    value={(form as Record<string, string>)[f.id]}
-                    onChange={e => setForm(p => ({ ...p, [f.id]: e.target.value }))}
-                    data-testid={`input-job-${f.id}`}
-                  />
-                </div>
-              ))}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="deadline" className="text-right">Deadline</Label>
-                <Input id="deadline" type="date" className="col-span-3"
-                  value={form.deadline} onChange={e => setForm(p => ({ ...p, deadline: e.target.value }))}
-                  data-testid="input-job-deadline" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Status</Label>
-                <div className="col-span-3">
-                  <Select value={form.status} onValueChange={v => setForm(p => ({ ...p, status: v }))}>
-                    <SelectTrigger data-testid="select-job-status">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="open">Open</SelectItem>
-                      <SelectItem value="screening">Screening</SelectItem>
-                      <SelectItem value="closed">Closed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-              <Button onClick={handleSubmit} disabled={createJob.isPending} data-testid="btn-submit-job">
-                Post Job Drive
+        {canManage && (
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="btn-post-job">
+                <Plus className="w-4 h-4 mr-2" /> Post New Job
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[520px]">
+              <DialogHeader>
+                <DialogTitle>Post New Job Drive</DialogTitle>
+                <DialogDescription>Create a new job posting for students to apply.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label className="text-right">Company</Label>
+                  <div className="col-span-3">
+                    <Select value={form.companyId} onValueChange={v => setForm(p => ({ ...p, companyId: v }))}>
+                      <SelectTrigger data-testid="select-company-job">
+                        <SelectValue placeholder="Select company" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {companies.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {[
+                  { id: "title", label: "Role Title", placeholder: "e.g. Software Engineer" },
+                  { id: "eligibleBranches", label: "Eligible Branches", placeholder: "e.g. CSE,ECE" },
+                  { id: "minCgpa", label: "Min CGPA", placeholder: "e.g. 7.0" },
+                  { id: "packageLpa", label: "Package (LPA)", placeholder: "e.g. 12.5" },
+                ].map(f => (
+                  <div key={f.id} className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor={f.id} className="text-right">{f.label}</Label>
+                    <Input
+                      id={f.id} placeholder={f.placeholder} className="col-span-3"
+                      value={(form as Record<string, string>)[f.id]}
+                      onChange={e => setForm(p => ({ ...p, [f.id]: e.target.value }))}
+                      data-testid={`input-job-${f.id}`}
+                    />
+                  </div>
+                ))}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="deadline" className="text-right">Deadline</Label>
+                  <Input id="deadline" type="date" className="col-span-3"
+                    value={form.deadline} onChange={e => setForm(p => ({ ...p, deadline: e.target.value }))}
+                    data-testid="input-job-deadline" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label className="text-right">Status</Label>
+                  <div className="col-span-3">
+                    <Select value={form.status} onValueChange={v => setForm(p => ({ ...p, status: v }))}>
+                      <SelectTrigger data-testid="select-job-status"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="open">Open</SelectItem>
+                        <SelectItem value="screening">Screening</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
+                <Button onClick={handleSubmit} disabled={createJob.isPending} data-testid="btn-submit-job">
+                  Post Job Drive
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="bg-card p-4 rounded-lg border">
@@ -185,18 +208,18 @@ export default function Jobs() {
               <TableHead>Package</TableHead>
               <TableHead>Deadline</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right">{canManage ? "Actions" : "Apply"}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading jobs...</TableCell>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading jobs…</TableCell>
               </TableRow>
             ) : filtered.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  {searchTerm ? `No jobs found matching "${searchTerm}"` : "No job postings yet. Post one or load sample data from the dashboard."}
+                  {searchTerm ? `No jobs found matching "${searchTerm}"` : "No job postings yet."}
                 </TableCell>
               </TableRow>
             ) : (
@@ -238,10 +261,31 @@ export default function Jobs() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(job.id)}
-                      data-testid={`btn-delete-job-${job.id}`}>
-                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                    </Button>
+                    {canManage ? (
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(job.id)}
+                        data-testid={`btn-delete-job-${job.id}`}>
+                        <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant={appliedJobs.has(job.id) ? "outline" : "default"}
+                        disabled={job.status !== "open" || appliedJobs.has(job.id) || applyingId === job.id}
+                        onClick={() => handleApply(job)}
+                        className="gap-1.5"
+                        data-testid={`btn-apply-${job.id}`}
+                      >
+                        {appliedJobs.has(job.id) ? (
+                          <><CheckCircle2 className="w-3.5 h-3.5 text-green-500" /> Applied</>
+                        ) : applyingId === job.id ? (
+                          "Applying…"
+                        ) : job.status !== "open" ? (
+                          "Closed"
+                        ) : (
+                          "Apply"
+                        )}
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

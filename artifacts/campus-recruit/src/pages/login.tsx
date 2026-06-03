@@ -118,6 +118,7 @@ export default function Login() {
             {[
               { role: "Admin", email: "admin@placeiq.edu", pass: "admin123" },
               { role: "Student", email: "student@college.edu", pass: "student123" },
+              { role: "Recruiter", email: "recruiter@company.com", pass: "recruit123" },
             ].map(d => (
               <button key={d.role} onClick={() => { setEmail(d.email); setPassword(d.pass); }}
                 className="flex items-center justify-between bg-muted/50 rounded px-3 py-2 hover:bg-muted transition-colors text-left"
