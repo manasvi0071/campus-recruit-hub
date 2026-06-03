@@ -17,6 +17,8 @@ import Analytics from "@/pages/analytics";
 import AIInsights from "@/pages/ai-insights";
 import Grievances from "@/pages/grievances";
 import Scorecard from "@/pages/scorecard";
+import Schedule from "@/pages/schedule";
+import Applications from "@/pages/applications";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 
@@ -75,6 +77,8 @@ function Router() {
       <Route path="/ai-insights" component={() => <ProtectedRoute component={AIInsights} path="/ai-insights" />} />
       <Route path="/scorecard" component={() => <ProtectedRoute component={Scorecard} path="/scorecard" />} />
       <Route path="/grievances" component={() => <ProtectedRoute component={Grievances} path="/grievances" />} />
+      <Route path="/schedule" component={() => <ProtectedRoute component={Schedule} path="/schedule" />} />
+      <Route path="/applications" component={() => <ProtectedRoute component={Applications} path="/applications" />} />
       <Route component={NotFound} />
     </Switch>
   );
