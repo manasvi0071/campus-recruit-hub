@@ -8,6 +8,7 @@ import applicationsRouter from "./applications";
 import dashboardRouter from "./dashboard";
 import grievancesRouter from "./grievances";
 import seedRouter from "./seed";
+import aiChatRouter from "./ai-chat";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(applicationsRouter);
 router.use(dashboardRouter);
 router.use(grievancesRouter);
 router.use(seedRouter);
+router.use(aiChatRouter);
 
 export default router;

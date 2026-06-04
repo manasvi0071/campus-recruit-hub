@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Layout } from "@/components/layout";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { AIAssistant } from "@/components/ai-assistant";
 import { ALLOWED_ROUTES, type UserRole } from "@/lib/roles";
 
 import Dashboard from "@/pages/dashboard";
@@ -93,6 +94,7 @@ function App() {
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
               <Router />
             </WouterRouter>
+            <AIAssistant />
             <Toaster />
           </TooltipProvider>
         </AuthProvider>
