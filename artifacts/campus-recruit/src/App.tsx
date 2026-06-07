@@ -22,6 +22,11 @@ import Schedule from "@/pages/schedule";
 import Applications from "@/pages/applications";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import ChallengeArena from "@/pages/challenge-arena";
+import Profile from "@/pages/profile";
+import InterviewDashboard from "@/pages/interview-dashboard";
+import NotificationSystem from "@/pages/notification-system";
+import AIHub from "@/pages/ai-hub";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1 } },
@@ -80,6 +85,18 @@ function Router() {
       <Route path="/grievances" component={() => <ProtectedRoute component={Grievances} path="/grievances" />} />
       <Route path="/schedule" component={() => <ProtectedRoute component={Schedule} path="/schedule" />} />
       <Route path="/applications" component={() => <ProtectedRoute component={Applications} path="/applications" />} />
+      <Route path="/challenge-arena">
+      <ProtectedRoute component={ChallengeArena} path="/challenge-arena" /></Route>
+      <Route path="/profile">
+      <ProtectedRoute component={Profile} path="/profile" />
+      </Route>
+      <Route path="/interview-dashboard">
+      <ProtectedRoute component={InterviewDashboard} path="/interview-dashboard" />
+      </Route>
+      <Route path="/notifications">
+      <ProtectedRoute component={NotificationSystem} path="/notifications" />
+      </Route>
+      <Route path="/ai-hub"><ProtectedRoute component={AIHub} path="/ai-hub" /></Route>
       <Route component={NotFound} />
     </Switch>
   );

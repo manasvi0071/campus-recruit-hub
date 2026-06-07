@@ -9,6 +9,8 @@ import dashboardRouter from "./dashboard";
 import grievancesRouter from "./grievances";
 import seedRouter from "./seed";
 import aiChatRouter from "./ai-chat";
+import drivesRouter from "./drives-route";
+import notificationsRouter from "./notifications-route";
 
 const router: IRouter = Router();
 
@@ -22,5 +24,7 @@ router.use(dashboardRouter);
 router.use(grievancesRouter);
 router.use(seedRouter);
 router.use(aiChatRouter);
+router.use(drivesRouter);
+router.use(notificationsRouter);
 
 export default router;

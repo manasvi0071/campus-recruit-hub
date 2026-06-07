@@ -1,8 +1,9 @@
 import {
   LayoutDashboard, Users, Building2, Briefcase, BarChart3,
   BrainCircuit, MessageSquareWarning, Trophy, CalendarDays,
-  ClipboardList, type LucideIcon,
+  ClipboardList, type LucideIcon, Flame, UserCircle, BellRing, Cpu, Layers,
 } from "lucide-react";
+
 
 export type UserRole = "admin" | "student" | "recruiter";
 
@@ -24,6 +25,9 @@ export const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { href: "/ai-insights", label: "AI Insights", icon: BrainCircuit },
     { href: "/scorecard", label: "Readiness Scorecard", icon: Trophy },
     { href: "/grievances", label: "Grievances", icon: MessageSquareWarning },
+    { href: "/interview-dashboard", label: "Interview Tracker", icon: LayoutDashboard },
+    { href: "/notifications", label: "Notifications", icon: BellRing },
+    { href: "/ai-hub", label: "AI Hub", icon: Cpu },
   ],
   student: [
     { href: "/", label: "My Dashboard", icon: LayoutDashboard },
@@ -32,19 +36,25 @@ export const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { href: "/applications", label: "My Applications", icon: ClipboardList },
     { href: "/scorecard", label: "My Scorecard", icon: Trophy },
     { href: "/grievances", label: "My Grievances", icon: MessageSquareWarning },
+    { href: "/challenge-arena", label: "Challenge Arena", icon: Flame },
+    { href: "/profile", label: "My Profile", icon: UserCircle },
+    { href: "/ai-hub", label: "AI Hub", icon: Cpu },
   ],
   recruiter: [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/jobs", label: "Job Postings", icon: Briefcase },
     { href: "/schedule", label: "Drive Schedule", icon: CalendarDays },
     { href: "/companies", label: "Companies", icon: Building2 },
+    { href: "/interview-dashboard", label: "Interview Tracker", icon: LayoutDashboard },
+    { href: "/notifications", label: "Notifications", icon: BellRing },
+    { href: "/ai-hub", label: "AI Hub", icon: Cpu },
   ],
 };
 
 export const ALLOWED_ROUTES: Record<UserRole, string[]> = {
-  admin: ["/", "/students", "/companies", "/jobs", "/analytics", "/ai-insights", "/scorecard", "/grievances", "/schedule", "/applications"],
-  student: ["/", "/jobs", "/scorecard", "/grievances", "/schedule", "/applications"],
-  recruiter: ["/", "/jobs", "/companies", "/schedule"],
+  admin: ["/", "/students", "/companies", "/jobs", "/analytics", "/ai-insights", "/scorecard", "/grievances", "/schedule", "/applications", "/interview-dashboard",  "/notifications", "/ai-hub"],
+  student: ["/", "/jobs", "/scorecard", "/grievances", "/schedule", "/applications", "/profile", "/challenge-arena", "/ai-hub"],
+  recruiter: ["/", "/jobs", "/companies", "/schedule", "/interview-dashboard", "/notifications", "/ai-hub"],
 };
 
 export function getRoleLabel(role: string): string {

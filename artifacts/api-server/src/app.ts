@@ -4,6 +4,9 @@ import pinoHttp from "pino-http";
 import session from "express-session";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import drivesRouter from "./routes/drives-route";
+import notificationsRouter from "./routes/notifications-route";
+
 
 const app: Express = express();
 
@@ -35,6 +38,10 @@ app.use(session({
     maxAge: 7 * 24 * 60 * 60 * 1000,
   },
 }));
+
+// inside app setup:
+app.use("/api/drives", drivesRouter);
+app.use("/api/notifications", notificationsRouter);
 
 app.use("/api", router);
 
