@@ -62,32 +62,42 @@ async function streamAI(
   onDone: () => void,
 ) {
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("/api/ai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514", max_tokens: 1000,
-        system, stream: true,
-        messages,
-      }),
+      credentials: "include",
+      body: JSON.stringify({ messages }),
     });
-    if (!res.ok || !res.body) throw new Error();
+
+    if (!res.ok || !res.body) throw new Error("Backend error");
+
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
+    let buffer = "";
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      for (const line of decoder.decode(value).split("\n")) {
-        if (line.startsWith("data: ")) {
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("data: ")) {
+          const jsonStr = trimmed.slice(6).trim();
+          if (jsonStr === "[DONE]") continue;
           try {
-            const d = JSON.parse(line.slice(6));
-            if (d.type === "content_block_delta" && d.delta?.text) onChunk(d.delta.text);
+            const data = JSON.parse(jsonStr);
+            if (data.content) onChunk(data.content);
+            if (data.done) break;
           } catch {}
         }
       }
     }
-  } catch {
-    onChunk("I'm here to help! Please try again.");
+  } catch (err) {
+    onChunk("\n\n❌ Could not connect to backend. Make sure the server is running on port 3000 with OPENAI_API_KEY set.");
   }
   onDone();
 }

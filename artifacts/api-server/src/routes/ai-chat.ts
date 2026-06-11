@@ -1,34 +1,15 @@
 import { Router } from "express";
-import OpenAI from "openai";
 
 const router = Router();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const SYSTEM_PROMPT = `You are TalentBot, the AI assistant for TalentHub Campus — a campus recruitment management platform used by placement officers, students, and recruiters at Indian engineering colleges.
-
-You help with:
-- Placement preparation tips (resume writing, interview prep, coding rounds, aptitude tests)
-- Campus recruitment process guidance (how drives work, application stages, offer letters)
-- Career advice tailored to Indian engineering students (CGPA requirements, branch-specific guidance, package negotiations)
-- Platform navigation (how to use TalentHub features)
-- Skill gap analysis and recommendations
-- Company-specific preparation tips for top MNCs (TCS, Infosys, Google, Microsoft, Amazon, etc.)
-
-Be concise, practical, and encouraging. Use bullet points for lists. Format responses in markdown. Keep responses focused and helpful. When giving tips, be specific and actionable.`;
+const SYSTEM_PROMPT = `You are TalentBot, an AI assistant for TalentHub Campus helping Indian engineering students with placement preparation, resume tips, interview prep, and career guidance. Be concise, practical and encouraging. Use bullet points. Format in markdown.`;
 
 router.post("/ai/chat", async (req, res) => {
-  const { messages } = req.body as {
-    messages: { role: "user" | "assistant"; content: string }[];
-  };
-
+  const { messages } = req.body;
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     res.status(400).json({ error: "messages array is required" });
     return;
   }
-
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
@@ -36,28 +17,56 @@ router.post("/ai/chat", async (req, res) => {
   res.flushHeaders();
 
   try {
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_tokens: 1024,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...messages,
-      ],
-      stream: true,
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        max_tokens: 1024,
+        stream: true,
+        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages.map((m: any) => ({ role: m.role, content: m.content }))],
+      }),
     });
 
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content;
-      if (content) {
-        res.write(`data: ${JSON.stringify({ content })}\n\n`);
-      }
+    if (!response.ok) {
+      const errText = await response.text();
+      console.log("GROQ ERROR:", errText);
+      res.write(`data: ${JSON.stringify({ content: "AI service error: " + errText })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
+      return;
     }
 
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") continue;
+          try {
+            const data = JSON.parse(jsonStr);
+            const content = data.choices?.[0]?.delta?.content;
+            if (content) res.write(`data: ${JSON.stringify({ content })}\n\n`);
+          } catch {}
+        }
+      }
+    }
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
-  } catch (err) {
-    req.log.error({ err }, "AI chat error");
-    res.write(`data: ${JSON.stringify({ error: "AI service unavailable" })}\n\n`);
+  } catch (err: any) {
+    console.log("ERROR:", err.message);
+    res.write(`data: ${JSON.stringify({ content: "Connection error: " + err.message })}\n\n`);
+    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
   }
 });

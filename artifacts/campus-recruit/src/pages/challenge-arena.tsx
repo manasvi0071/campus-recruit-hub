@@ -96,43 +96,34 @@ Based on this, tailor your responses to address their specific failure points.
 
 Keep responses focused, warm, and action-oriented. Use bullet points and numbered lists for clarity. Always end with one specific action they can take RIGHT NOW.`;
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      system: systemPrompt,
-      stream: true,
-      messages: messages.map(m => ({ role: m.role, content: m.content })),
-    }),
-  });
+  const response = await fetch("/api/ai/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify({ messages }),
+});
 
-  if (!response.ok || !response.body) {
-    onChunk("I'm here to help you bounce back stronger! Could you tell me more about which round you struggled with and what happened?");
-    onDone();
-    return;
-  }
+if (!response.ok || !response.body) throw new Error();
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+let buffer = "";
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    const text = decoder.decode(value);
-    for (const line of text.split("\n")) {
-      if (line.startsWith("data: ")) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          if (data.type === "content_block_delta" && data.delta?.text) {
-            onChunk(data.delta.text);
-          }
-        } catch {}
-      }
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
+  const lines = buffer.split("\n");
+  buffer = lines.pop() ?? "";
+  for (const line of lines) {
+    if (line.startsWith("data: ")) {
+      try {
+        const data = JSON.parse(line.slice(6));
+        if (data.content) onChunk(data.content);
+      } catch {}
     }
   }
-  onDone();
+}
 }
 
 // ─── Difficulty badge ─────────────────────────────────────────────────────────

@@ -127,14 +127,14 @@ export default function Profile() {
       let res;
       if (mine) {
         res = await fetch(`/api/students/${mine.id}`, {
-          method: "PUT",
+          method: "PATCH",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify(payload),
         });
       } else {
         res = await fetch("/api/students", {
-          method: "POST",
+          method: "PATCH",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify(payload),
