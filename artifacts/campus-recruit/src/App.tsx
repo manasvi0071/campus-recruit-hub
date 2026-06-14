@@ -27,6 +27,7 @@ import Profile from "@/pages/profile";
 import InterviewDashboard from "@/pages/interview-dashboard";
 import NotificationSystem from "@/pages/notification-system";
 import AIHub from "@/pages/ai-hub";
+import Landing from "@/pages/landing";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1 } },
@@ -38,7 +39,7 @@ function ProtectedRoute({ component: Component, path }: { component: React.Compo
 
   useEffect(() => {
     if (!loading && !user) {
-      setLocation("/login");
+      setLocation("/landing");
       return;
     }
     if (!loading && user) {
@@ -73,6 +74,7 @@ function ProtectedRoute({ component: Component, path }: { component: React.Compo
 function Router() {
   return (
     <Switch>
+      <Route path="/landing" component={Landing} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/" component={() => <ProtectedRoute component={Dashboard} path="/" />} />
