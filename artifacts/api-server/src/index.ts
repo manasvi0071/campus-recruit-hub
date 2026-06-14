@@ -1,7 +1,7 @@
 import app from "./app";
 import "dotenv/config";
 import { logger } from "./lib/logger";
-import collegesRouter from "./colleges-route";
+
 
 const rawPort = process.env["PORT"];
 
