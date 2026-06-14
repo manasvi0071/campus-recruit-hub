@@ -11,6 +11,7 @@ import seedRouter from "./seed";
 import aiChatRouter from "./ai-chat";
 import drivesRouter from "./drives-route";
 import notificationsRouter from "./notifications-route";
+import collegesRouter from "./colleges-route";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(seedRouter);
 router.use(aiChatRouter);
 router.use(drivesRouter);
 router.use(notificationsRouter);
+router.use(collegesRouter);
 
 export default router;
